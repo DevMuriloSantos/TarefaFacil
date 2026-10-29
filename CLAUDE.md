@@ -106,6 +106,18 @@ Valide todos os campos manipuláveis pelo usuário, sem exigir bibliotecas exter
 
 Apresente mensagens claras e específicas. Não implemente regras de negócio ainda não aprovadas.
 
+### Tarefas (decisões aprovadas)
+
+Campos de `Task`: `id`, `title` (obrigatório), `description` (opcional), `dueDate` (data e horário obrigatórios), `completed`, `createdAt`, `updatedAt`. Datas armazenadas como strings ISO 8601. Sem categorias, etiquetas ou prioridades. Datas passadas são permitidas no formulário.
+
+Indicadores, calculados a partir das tarefas carregadas e do horário local do dispositivo:
+- **Todas:** todas as tarefas, inclusive as concluídas.
+- **Pendentes:** `!completed && dueDate > agora`.
+- **Vencidas:** `!completed && dueDate <= agora`.
+- **Concluídas:** `completed`, independentemente do vencimento.
+
+Pendentes e vencidas são grupos separados; tarefa concluída não entra em nenhum dos dois. Na tela Principal, Todas, Pendentes e Vencidas são clicáveis e filtram a lista, sem telas adicionais.
+
 ## 8. Exclusões e ações irreversíveis
 
 Exija confirmação explícita antes de executar ações irreversíveis, incluindo:
@@ -141,9 +153,7 @@ Não avance automaticamente para outra funcionalidade após concluir a tarefa au
 ## 11. Decisões pendentes
 
 Não presuma as seguintes definições:
-- Campos obrigatórios e opcionais das tarefas.
-- Comportamento dos indicadores e critério para tarefas vencidas.
-- Ordenação das listas e tratamento de datas.
+- Ordenação das listas.
 - Campos definitivos do perfil.
 - Efeitos da exclusão do perfil sobre tarefas e preferências.
 - Estratégia de persistência da foto.
