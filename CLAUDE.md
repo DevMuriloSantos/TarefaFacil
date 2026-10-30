@@ -73,13 +73,13 @@ Utilize React Native Paper e Expo Vector Icons, mantendo consistência de cores,
 O aplicativo terá as seguintes telas:
 - **Principal:** indicadores de todas as tarefas, pendentes e vencidas; listagem com `FlatList`; ações de editar, concluir e excluir; botão flutuante para criar tarefas.
 - **Concluídas:** listagem das tarefas concluídas e indicador do total concluído.
-- **Perfil:** cadastro demonstrativo, foto, email, data de criação, edição e exclusão.
+- **Perfil:** perfil local demonstrativo, com foto, e-mail, data de criação, edição e exclusão (regras na seção 6).
 - **Configurações:** tema, limpeza dos dados locais e créditos.
 - **Formulário de tarefas:** criação e edição.
 
 A navegação utilizará Bottom Tabs e Native Stack. A distribuição definitiva das rotas deverá respeitar os requisitos e a estrutura existente.
 
-O cabeçalho será compartilhado, com título dinâmico conforme a tela ativa e avatar clicável para abrir o Perfil. Na própria tela Perfil, o avatar do cabeçalho deverá ser ocultado.
+O cabeçalho será compartilhado, com título dinâmico conforme a tela ativa e avatar clicável para abrir o Perfil. O avatar exibe a foto do perfil quando existir e o avatar padrão caso contrário, refletindo alterações da foto sem reiniciar o aplicativo. Na própria tela Perfil, o avatar do cabeçalho deverá ser ocultado.
 
 ## 6. Perfil, imagens e temas
 
@@ -87,9 +87,28 @@ O aplicativo não possui autenticação real nem backend. O perfil é demonstrat
 
 A tela Perfil deverá permitir escolher uma foto da galeria ou utilizar a câmera, respeitando as permissões do dispositivo. Trate cancelamentos, recusas de permissão e erros sem causar falhas no aplicativo.
 
-Defina a estratégia de persistência da imagem considerando sua disponibilidade após reinicializações. Não presuma que uma URI temporária ou imagem em cache seja permanente. Se a solução exigir uma dependência adicional ou decisão arquitetural relevante, solicite aprovação.
+A imagem selecionada deve continuar disponível após fechar e reabrir o aplicativo. Não dependa exclusivamente da URI temporária do seletor nem presuma que imagem em cache seja permanente. Use os recursos já instalados no projeto, verificando a API compatível com a versão atual do Expo. Dependência adicional ou alteração de configuração exige aprovação.
 
 O usuário poderá alternar entre os temas claro e escuro. A preferência deverá persistir após o fechamento do aplicativo e ser aplicada consistentemente à interface.
+
+### Perfil (decisões aprovadas)
+
+Perfil local, sem autenticação real, servidor ou backend, persistido com AsyncStorage. Campos:
+- `name`: obrigatório.
+- `email`: obrigatório, com formato validado.
+- `photoUri`: opcional (caminho ou referência da foto).
+- `createdAt`: gerado automaticamente na criação e nunca alterado pela edição.
+- Cor da borda da foto, persistida junto ao perfil e escolhida somente entre **azul** e **verde-claro**; outras cores exigem autorização. A espessura da borda é fixa.
+
+Nome e e-mail permanecem obrigatórios (e-mail com formato validado). O desenvolvedor está autorizado a definir limites máximos razoáveis de entrada para ambos e a validá-los de forma coerente; são limites da interface, não regras de negócio imutáveis.
+
+Sem perfil cadastrado, a tela exibe o avatar padrão, botões para escolher foto na galeria e tirar foto com a câmera, campos obrigatórios de nome e e-mail e o botão **Criar perfil**, que valida os campos. A câmera só é usada após a permissão do usuário. A foto é opcional; sem ela, exibe-se o avatar padrão.
+
+Com perfil cadastrado, a tela exibe foto, nome, e-mail, data de criação e os botões **Editar perfil** (abre formulário de edição com validação), **Excluir dados do usuário** e **Excluir conta**. O cabeçalho da tela mostra apenas o título, sem o avatar.
+
+Exclusões, independentes e irreversíveis, cada uma com diálogo de confirmação próprio e texto que deixe clara a diferença:
+- **Excluir dados do usuário:** remove somente o perfil e a foto armazenada localmente. Preserva todas as tarefas e a preferência de tema atual (`light` ou `dark`). A tela Perfil volta ao estado inicial de criação de perfil.
+- **Excluir conta:** remove o perfil, a foto armazenada localmente, todas as tarefas e a preferência de tema salva. O tema volta ao padrão `light` e o aplicativo retorna ao estado inicial.
 
 ## 7. Persistência e validação
 
@@ -122,12 +141,12 @@ Pendentes e vencidas são grupos separados; tarefa concluída não entra em nenh
 
 Exija confirmação explícita antes de executar ações irreversíveis, incluindo:
 - Excluir uma tarefa.
-- Excluir o cadastro do perfil.
+- Excluir os dados do usuário ou a conta (seção 6).
 - Excluir todos os dados locais.
 
 Utilize diálogos adequados, preferencialmente do React Native Paper. Cancelar deve manter os dados inalterados.
 
-Antes de implementar a exclusão do perfil ou a limpeza completa, confirme quais informações serão removidas e os efeitos sobre tarefas e preferências.
+Os efeitos da exclusão de dados do usuário e da conta estão definidos na seção 6. Antes de implementar a limpeza completa em Configurações, confirme quais informações serão removidas e como ela se relaciona com "Excluir conta".
 
 ## 9. Testes e qualidade
 
@@ -154,9 +173,8 @@ Não avance automaticamente para outra funcionalidade após concluir a tarefa au
 
 Não presuma as seguintes definições:
 - Ordenação das listas.
-- Campos definitivos do perfil.
-- Efeitos da exclusão do perfil sobre tarefas e preferências.
-- Estratégia de persistência da foto.
+- Relação entre "Excluir conta" e a limpeza de dados locais de Configurações.
+- API de `expo-file-system` (SDK 58) para persistir a foto: decisão técnica da implementação.
 - Nomes dos desenvolvedores, versão e endereço definitivo do repositório.
 
 Quando uma decisão pendente afetar a tarefa atual, apresente a dúvida e aguarde aprovação. Não bloqueie trabalhos independentes que não dependam dela.

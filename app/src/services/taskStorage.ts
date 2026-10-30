@@ -94,6 +94,17 @@ export function loadTasks(): Promise<Task[]> {
   return enqueue(readTasks);
 }
 
+/** Remove todas as tarefas salvas. */
+export function clearTasks(): Promise<void> {
+  return enqueue(async () => {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEY);
+    } catch {
+      throw new TaskStorageError('Não foi possível excluir as tarefas.');
+    }
+  });
+}
+
 export function getTask(id: string): Promise<Task> {
   return enqueue(async () => {
     const tasks = await readTasks();
