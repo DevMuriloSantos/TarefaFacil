@@ -89,31 +89,6 @@ export default function ProfileForm({
     }
   };
 
-  const takePhoto = async () => {
-    setPhotoError(null);
-    try {
-      const permission = await ImagePicker.requestCameraPermissionsAsync();
-      if (!permission.granted) {
-        setPhotoError(
-          permission.canAskAgain
-            ? 'Sem permissão para usar a câmera. Conceda o acesso para tirar uma foto.'
-            : 'O acesso à câmera está bloqueado. Habilite-o nas configurações do aparelho.',
-        );
-        return;
-      }
-      handlePickResult(
-        await ImagePicker.launchCameraAsync({
-          mediaTypes: ['images'],
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 0.8,
-        }),
-      );
-    } catch {
-      setPhotoError('Não foi possível abrir a câmera.');
-    }
-  };
-
   const validate = (): FormErrors => {
     const result: FormErrors = {};
     const trimmedName = name.trim();
@@ -162,9 +137,6 @@ export default function ProfileForm({
       <View style={styles.photoButtons}>
         <Button mode="outlined" icon="image-outline" onPress={pickFromGallery} disabled={saving}>
           Galeria
-        </Button>
-        <Button mode="outlined" icon="camera-outline" onPress={takePhoto} disabled={saving}>
-          Câmera
         </Button>
       </View>
       <HelperText type="error" visible={photoError !== null}>

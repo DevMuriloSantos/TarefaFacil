@@ -14,6 +14,11 @@ export async function loadThemeMode(): Promise<ThemeMode> {
   }
 }
 
+/** Grava a preferência de tema. Rejeita em caso de falha, para o chamador avisar o usuário. */
+export function saveThemeMode(mode: ThemeMode): Promise<void> {
+  return AsyncStorage.setItem(STORAGE_KEY, mode);
+}
+
 export function clearThemeMode(): Promise<void> {
   return AsyncStorage.removeItem(STORAGE_KEY);
 }
